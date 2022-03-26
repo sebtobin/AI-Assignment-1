@@ -14,6 +14,8 @@ import json
 # then import from them like this:
 from search.util import print_board, print_coordinate
 
+from search.pathfinding import search_path
+
 def main():
 
     try:
@@ -41,6 +43,7 @@ def main():
 
     print_board(data["n"], board_dict)
 
+    search_path(data["start"], data["goal"])
 
 
-
+# HI PEPUCHINO
