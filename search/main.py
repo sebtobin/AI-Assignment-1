@@ -15,6 +15,7 @@ import json
 from search.util import print_board, print_coordinate
 
 from search.pathfinding import search_path
+from search.functions import heuristic
 
 def main():
 
@@ -44,6 +45,8 @@ def main():
     print_board(data["n"], board_dict)
 
     search_path(data["start"], data["goal"])
+
+    print(heuristic(3, 4, data["goal"][0], data["goal"][1]))
 
 
 # HI PEPUCHINO

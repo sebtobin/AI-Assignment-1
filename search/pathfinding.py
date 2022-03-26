@@ -9,7 +9,7 @@ class Node:
     def heuristic(self, goal_node):
         return (abs(self.coordinate_q - goal_node.coordinate_q) +
                 abs(self.coordinate_r - goal_node.coordinate_r) +
-                abs(self.coordinate_q - goal_node.coordinate_q + self.coordinate_r - goal_node.coordinate_r) / 2)
+                abs(self.coordinate_q - goal_node.coordinate_q + self.coordinate_r - goal_node.coordinate_r))/2
 
     def get_coordinate_tuple(self):
         coordinate_tuple = (self.coordinate_q, self.coordinate_r)
