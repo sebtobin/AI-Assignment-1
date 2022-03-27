@@ -44,9 +44,8 @@ def main():
 
     print_board(data["n"], board_dict)
 
-    search_path(data["start"], data["goal"])
+    search_path(data)
 
-    print(heuristic(3, 4, data["goal"][0], data["goal"][1]))
 
 
 # HI PEPUCHINO
