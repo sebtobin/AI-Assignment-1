@@ -14,12 +14,12 @@ class Node:
 
     def get_adjacent_nodes(self):
         adjacent_nodes = []
-        adjacent_nodes.append(Node(self.q + 1, self.r))
-        adjacent_nodes.append(Node(self.q, self.r + 1))
-        adjacent_nodes.append(Node(self.q + 1, self.r + 1))
-        adjacent_nodes.append(Node(self.q - 1, self.r))
         adjacent_nodes.append(Node(self.q, self.r - 1))
-        adjacent_nodes.append(Node(self.q - 1, self.r - 1))
+        adjacent_nodes.append(Node(self.q, self.r + 1))
+        adjacent_nodes.append(Node(self.q - 1, self.r))
+        adjacent_nodes.append(Node(self.q - 1, self.r + 1))
+        adjacent_nodes.append(Node(self.q + 1, self.r - 1))
+        adjacent_nodes.append(Node(self.q + 1, self.r))
         return adjacent_nodes
 
     def heuristic(self, goal_node):
@@ -77,6 +77,8 @@ def search_path(data):
     came_from_dict = {start_node: None}
     cumulative_cost_dict = {start_node: 0}
 
+    cur_node = None
+
     while not pq.is_empty():
         # cur_node_cost is an object of NodeCost class which stores an object of Node class, it's path cost and
         # it's heuristic value. cur_node is the aforementioned object of Node class corresponding to cur_node_cost.
@@ -91,8 +93,8 @@ def search_path(data):
 
             # If an adjacent node is out of bounds or is already occupied as per the data read in from
             # sample_input.json, then ignore this node and move on to the next one.
-            if not in_bounds(data["n"], adjacent_node.q, adjacent_node.r or
-                   is_occupied(data, adjacent_node.q, adjacent_node.r)):
+            if ((not in_bounds(data["n"], adjacent_node.q, adjacent_node.r) or
+                is_occupied(data, adjacent_node.q, adjacent_node.r))):
                 continue
 
             # Path cost of one node to the other is always 1. Find the cumulative_path_cost of the current node
@@ -116,22 +118,22 @@ def search_path(data):
         while cur_node is not None:
             path.insert(0, cur_node.get_coordinate_tuple())
             cur_node = came_from_dict[cur_node]
-        print(path.len() + "\n")
+        print(str(len(path)))
         for coord in path:
-            print(coord + "\n")
+            print(str(coord))
     # no solution was found
     else:
         # tbd
         pass
 
 
-
-
 def in_bounds(n, q, r):
-    return q >= 0 or q < n or r >= 0 or r < n
+    return (0 <= q < n) and (0 <= r < n)
 
 
 def is_occupied(data, q, r):
+    if q == 1 and r == 0:
+        print()
     for node in data["board"]:
         if q == node[1] and r == node[2]:
             return True
