@@ -91,8 +91,8 @@ def search_path(data):
 
             # If an adjacent node is out of bounds or is already occupied as per the data read in from
             # sample_input.json, then ignore this node and move on to the next one.
-            if(not in_bounds(data["n"], adjacent_node.q, adjacent_node.r) or
-                    is_occupied(data, adjacent_node.q, adjacent_node.r)):
+            if not in_bounds(data["n"], adjacent_node.q, adjacent_node.r or
+                   is_occupied(data, adjacent_node.q, adjacent_node.r)):
                 continue
 
             # Path cost of one node to the other is always 1. Find the cumulative_path_cost of the current node
@@ -109,6 +109,22 @@ def search_path(data):
                 # created and heap.heapify will use the __lt__ comparator method of the object to do heapsort.
                 pq.insert_node(adjacent_node, new_cost, goal_node)
                 came_from_dict[adjacent_node] = cur_node
+
+    # a solution was found
+    if cur_node == goal_node:
+        path = []
+        while cur_node is not None:
+            path.insert(0, cur_node.get_coordinate_tuple())
+            cur_node = came_from_dict[cur_node]
+        print(path.len() + "\n")
+        for coord in path:
+            print(coord + "\n")
+    # no solution was found
+    else:
+        # tbd
+        pass
+
+
 
 
 def in_bounds(n, q, r):
