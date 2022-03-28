@@ -47,13 +47,18 @@ class NodeCost:
 
 
 class PriorityQueue:
-    def __init__(self):
+    def __init__(self, type):
         self.heap = []
+        self.type = type
 
-    def insert_node(self, node_to_insert, cumulative_path_cost, goal_node):
-        cur_node_cost = NodeCost(node_to_insert, cumulative_path_cost, goal_node)
-        self.heap.append(cur_node_cost)
-        heapq.heapify(self.heap)
+    def insert_obj(self, obj):
+        if isinstance(obj, self.type):
+            self.heap.append(obj)
+            heapq.heapify(self.heap)
+        else:
+            #error handling tbd
+            pass
+
 
     def pop_min(self):
         return heapq.heappop(self.heap)
@@ -64,7 +69,6 @@ class PriorityQueue:
 
 # Takes in the coordinates of the start and goal.
 def search_path(data):
-    pq = PriorityQueue()
 
     start_coordinates = data["start"]
     start_node = Node(start_coordinates[0], start_coordinates[1])
@@ -72,7 +76,9 @@ def search_path(data):
     goal_coordinates = data["goal"]
     goal_node = Node(goal_coordinates[0], goal_coordinates[1])
 
-    pq.insert_node(start_node, 0, goal_node)
+    start_node_cost = NodeCost(start_node, 0, goal_node)
+    pq = PriorityQueue(type(start_node_cost))
+    pq.insert_obj(start_node_cost)
 
     came_from_dict = {start_node: None}
     cumulative_cost_dict = {start_node: 0}
@@ -107,7 +113,8 @@ def search_path(data):
 
                 # When a node is inserted into the priority queue, a NodeCost object corresponding to it will be
                 # created and heap.heapify will use the __lt__ comparator method of the object to do heapsort.
-                pq.insert_node(adjacent_node, new_cost, goal_node)
+                adj_node_cost = NodeCost(adjacent_node, new_cost, goal_node)
+                pq.insert_obj(adj_node_cost)
                 came_from_dict[adjacent_node] = cur_node
 
     # a solution was found
@@ -121,8 +128,7 @@ def search_path(data):
             print(coord + "\n")
     # no solution was found
     else:
-        # tbd
-        pass
+        print("No path solution found")
 
 
 
