@@ -1,35 +1,55 @@
 import heapq
+from search.util import print_coordinate
 
 
 class Node:
-    def __init__(self, q, r):
-        self.q = q
+    def __init__(self, r, q):
         self.r = r
+        self.q = q
 
     def __eq__(self, other):
-        return self.q == other.q and self.r == other.r
+        return self.r == other.r and self.q == other.q
 
     def __hash__(self):
-        return hash((self.q, self.r))
+        return hash((self.r, self.q))
 
     def get_adjacent_nodes(self):
         adjacent_nodes = []
-        adjacent_nodes.append(Node(self.q + 1, self.r))
-        adjacent_nodes.append(Node(self.q, self.r + 1))
-        adjacent_nodes.append(Node(self.q + 1, self.r + 1))
-        adjacent_nodes.append(Node(self.q - 1, self.r))
-        adjacent_nodes.append(Node(self.q, self.r - 1))
-        adjacent_nodes.append(Node(self.q - 1, self.r - 1))
+        # Going diagonally towards bottom left
+        adjacent_nodes.append(Node(self.r - 1, self.q))
+        # Going diagonally towards top right
+        adjacent_nodes.append(Node(self.r + 1, self.q))
+        # Going horizontally towards left
+        adjacent_nodes.append(Node(self.r, self.q - 1))
+        # Going horizontally towards right
+        adjacent_nodes.append(Node(self.r, self.q + 1))
+        # Going diagonally towards top left
+        adjacent_nodes.append(Node(self.r + 1, self.q - 1))
+        # Going diagonally towards bot right
+        adjacent_nodes.append(Node(self.r - 1, self.q + 1))
         return adjacent_nodes
 
+    ''' The heuristic function used is axial distance. The formula to calculate axial distance of 2 tiles was studied
+        and referenced from https://www.redblobgames.com/grids/hexagons/#distances. The axial distance is
+        based on the Manhattan distance and is effectively the cost of moving 1 tile on the board to another tile
+        (the goal in this case) in a hexagonal grid. The admissibility of this heuristic will be described and verified
+        in the report. '''
     def heuristic(self, goal_node):
-        return (abs(self.q - goal_node.q) +
-                abs(self.r - goal_node.r) +
-                abs(self.q - goal_node.q + self.r - goal_node.r))/2
+        return (abs(self.r - goal_node.r) +
+                abs(self.q - goal_node.q) +
+                abs(self.r - goal_node.r + self.q - goal_node.q))/2
 
-    def get_coordinate_tuple(self):
-        coordinate_tuple = (self.q, self.r)
-        return coordinate_tuple
+    def in_bounds(self, n):
+        return (0 <= self.r < n) and (0 <= self.q < n)
+
+    def is_occupied(self, data):
+        for node in data["board"]:
+            if self.r == node[1] and self.q == node[2]:
+                return True
+        return False
+
+    def print_node_coordinate(self):
+        print_coordinate(self.r, self.q)
 
 
 # Stores a Node and both its cumulative path cost, and its heuristic
@@ -53,12 +73,10 @@ class PriorityQueue:
 
     def insert_obj(self, obj):
         if isinstance(obj, self.type):
-            self.heap.append(obj)
-            heapq.heapify(self.heap)
+            heapq.heappush(self.heap, obj)
         else:
             #error handling tbd
             pass
-
 
     def pop_min(self):
         return heapq.heappop(self.heap)
@@ -67,7 +85,11 @@ class PriorityQueue:
         return len(self.heap) == 0
 
 
-# Takes in the coordinates of the start and goal.
+''' Takes in data read from a .json file and performs A* search. The A* algorithm implementation was referenced from 
+    the website https://www.redblobgames.com/pathfinding/a-star/introduction.html#astar with several adaptations
+    such as using a heap to implement PriorityQueue as well as Node and NodeCost classes. There also has
+    been modifications made using the rules from the Cachex specification and the Project A specification in order
+    to make certain nodes invalid such as tiles which have been occupied. '''
 def search_path(data):
 
     start_coordinates = data["start"]
@@ -81,7 +103,7 @@ def search_path(data):
     pq.insert_obj(start_node_cost)
 
     came_from_dict = {start_node: None}
-    cumulative_cost_dict = {start_node: 0}
+    cumulative_path_cost_dict = {start_node: 0}
 
     while not pq.is_empty():
         # cur_node_cost is an object of NodeCost class which stores an object of Node class, it's path cost and
@@ -93,23 +115,23 @@ def search_path(data):
         if cur_node == goal_node:
             break
 
+        # For each node, the average branching factor is 6, as there are 6 possible adjacent nodes to move to.
         for adjacent_node in cur_node.get_adjacent_nodes():
 
             # If an adjacent node is out of bounds or is already occupied as per the data read in from
             # sample_input.json, then ignore this node and move on to the next one.
-            if not in_bounds(data["n"], adjacent_node.q, adjacent_node.r or
-                   is_occupied(data, adjacent_node.q, adjacent_node.r)):
+            if (not adjacent_node.in_bounds(data["n"]) or adjacent_node.is_occupied(data)):
                 continue
 
             # Path cost of one node to the other is always 1. Find the cumulative_path_cost of the current node
             # add 1 to it and this is the new_cost of this adjacent node.
-            new_cost = cumulative_cost_dict[cur_node] + 1
+            new_cost = cumulative_path_cost_dict[cur_node] + 1
 
             # If this node isn't in cumulative_cost_dict, we have not visited it yet. If the new_cost is less
             # than the value in the cumulative_cost_dict, that means we found a better route to this node.
             # In both cases, we choose to explore that node.
-            if adjacent_node not in cumulative_cost_dict or new_cost < cumulative_cost_dict[adjacent_node]:
-                cumulative_cost_dict[adjacent_node] = new_cost
+            if adjacent_node not in cumulative_path_cost_dict or new_cost < cumulative_path_cost_dict[adjacent_node]:
+                cumulative_path_cost_dict[adjacent_node] = new_cost
 
                 # When a node is inserted into the priority queue, a NodeCost object corresponding to it will be
                 # created and heap.heapify will use the __lt__ comparator method of the object to do heapsort.
@@ -117,28 +139,18 @@ def search_path(data):
                 pq.insert_obj(adj_node_cost)
                 came_from_dict[adjacent_node] = cur_node
 
-    # a solution was found
+    # If cur_node is goal_node outside of the A* while loop, that means that break was called in the while loop
+    # and that a solution is found. Thus go backwards through the solution and then insert each node at the
+    # start of the list to get the full path in order and then print it out.
     if cur_node == goal_node:
         path = []
         while cur_node is not None:
-            path.insert(0, cur_node.get_coordinate_tuple())
+            path.insert(0, cur_node)
             cur_node = came_from_dict[cur_node]
-        print(path.len() + "\n")
-        for coord in path:
-            print(coord + "\n")
-    # no solution was found
+        print(len(path))
+        for node in path:
+            node.print_node_coordinate()
+    # Otherwise, we have not reached the goal node with A* search and so no solution was found.
     else:
         print("No path solution found")
 
-
-
-
-def in_bounds(n, q, r):
-    return q >= 0 or q < n or r >= 0 or r < n
-
-
-def is_occupied(data, q, r):
-    for node in data["board"]:
-        if q == node[1] and r == node[2]:
-            return True
-    return False
