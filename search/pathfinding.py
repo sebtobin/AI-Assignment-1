@@ -139,11 +139,15 @@ def search_path(data):
                 pq.insert_obj(adj_node_cost)
                 came_from_dict[adjacent_node] = cur_node
 
-    # If cur_node is goal_node outside of the A* while loop, that means that break was called in the while loop
-    # and that a solution is found. Thus go backwards through the solution and then insert each node at the
-    # start of the list to get the full path in order and then print it out.
+    # If cur_node is determined to be goal_node outside the A* while loop, that means that break was
+    # called in the while loop and that a solution is found.
     if cur_node == goal_node:
         path = []
+        # cur_node is the goal node at the start of the while loop, and from the goal node, go backwards and get
+        # each node expanded to reach the goal node. In a tree representation, this is essentially going back up
+        # the tree from the goal node.
+        # Insert each of these nodes into index 0 in the path list such that a sequential path of nodes from the
+        # start_node to the goal_node is formed through index 0 to d in the list.
         while cur_node is not None:
             path.insert(0, cur_node)
             cur_node = came_from_dict[cur_node]
