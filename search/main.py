@@ -15,7 +15,7 @@ import json
 from search.util import print_board, print_coordinate
 
 from search.pathfinding import search_path
-from search.functions import heuristic
+#from search.functions import heuristic
 
 def main():
 
