@@ -195,7 +195,7 @@ def search_path(data):
             path.insert(0, cur_node)
             cur_node = came_from_dict[cur_node]
 
-
+    # Print the length of the path, if applicable and then the coordinates of all the nodes in the path.
     print(len(path))
     for node in path:
         node.print_node_coordinate()
