@@ -15,7 +15,6 @@ import json
 from search.util import print_board, print_coordinate
 
 from search.pathfinding import search_path
-#from search.functions import heuristic
 
 def main():
 
@@ -33,16 +32,14 @@ def main():
     # `print_board` helper function? (See the `util.py` source code for
     # usage information).
 
-    print(data)
-
-    board_dict = {}
-    for tile in data["board"]:
-        board_dict[(tile[1], tile[2])] = tile[0]
-
-    board_dict[(data["start"][0], data["start"][1])] = "start"
-    board_dict[(data["goal"][0], data["goal"][1])] = "goal"
-
-    print_board(data["n"], board_dict)
+    # board_dict = {}
+    # for tile in data["board"]:
+    #     board_dict[(tile[1], tile[2])] = tile[0]
+    #
+    # board_dict[(data["start"][0], data["start"][1])] = "start"
+    # board_dict[(data["goal"][0], data["goal"][1])] = "goal"
+    #
+    # print_board(data["n"], board_dict)
 
     search_path(data)
 
