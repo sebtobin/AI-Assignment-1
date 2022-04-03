@@ -139,10 +139,11 @@ def search_path(data):
                 pq.insert_obj(adj_node_cost)
                 came_from_dict[adjacent_node] = cur_node
 
+    path = []
     # If cur_node is determined to be goal_node outside the A* while loop, that means that break was
-    # called in the while loop and that a solution is found.
+    # called in the while loop and that a solution is found. If goal node was not reached, the path is empty and
+    # the length of the path is 0.w
     if cur_node == goal_node:
-        path = []
         # cur_node is the goal node at the start of the while loop, and from the goal node, go backwards and get
         # each node expanded to reach the goal node. In a tree representation, this is essentially going back up
         # the tree from the goal node.
@@ -151,10 +152,9 @@ def search_path(data):
         while cur_node is not None:
             path.insert(0, cur_node)
             cur_node = came_from_dict[cur_node]
-        print(len(path))
-        for node in path:
-            node.print_node_coordinate()
-    # Otherwise, we have not reached the goal node with A* search and so no solution was found.
-    else:
-        print("No path solution found")
+
+
+    print(len(path))
+    for node in path:
+        node.print_node_coordinate()
 
