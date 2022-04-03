@@ -100,26 +100,28 @@ class PriorityQueue:
         self.heap = []
         self.type = type
 
-    """
-    Method for inserting object into PQ, must be of certain type.
-    """
+
     def insert_obj(self, obj):
+        """
+        Method for inserting object into PQ, must be of certain type.
+        """
         if isinstance(obj, self.type):
             heapq.heappush(self.heap, obj)
         else:
             #error handling tbd
             pass
 
-    """
-    Method for popping minimum object as defined by __lt__ operator.
-    """
     def pop_min(self):
+        """
+        Method for popping minimum object as defined by __lt__ operator.
+        """
         return heapq.heappop(self.heap)
 
-    """
-    Returns True if PQ is empty.
-    """
+
     def is_empty(self):
+        """
+        Returns True if PQ is empty.
+        """
         return len(self.heap) == 0
 
 
